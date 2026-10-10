@@ -43,7 +43,7 @@ In the download directory, replace `ARCHIVE` with the downloaded filename:
 archive=ARCHIVE
 shasum -a 256 -c SHA256SUMS --ignore-missing
 mkdir -p "$HOME/.local/bin"
-tar -xzf "$archive" -C "$HOME/.local/bin"
+tar -xzf "$archive" -C "$HOME/.local/bin" fnm-shim
 ```
 
 ### Enable the shims
@@ -73,3 +73,7 @@ Tags use `v0.0.<workflow run number>`, and point to the exact built commit.
 Numbers may have gaps because PR runs also increment the counter. These are
 build release identifiers, independent of the Cargo package version. No manual
 tagging or crates.io publishing is required.
+
+## License
+
+[MIT](LICENSE). Release archives include the license text.

@@ -45,7 +45,7 @@ jobs:
         run: |
           mkdir dist
           archive="fnm-shim-${GITHUB_SHA}-${TARGET}.tar.gz"
-          tar -czf "dist/$archive" -C "target/$TARGET/release" fnm-shim
+          tar -czf "dist/$archive" -C "target/$TARGET/release" fnm-shim -C "$GITHUB_WORKSPACE" LICENSE
           cd dist
           shasum -a 256 "$archive" > "$archive.sha256"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
