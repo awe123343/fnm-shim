@@ -3,6 +3,11 @@ name: Build and release
 on:
   push:
     branches: [main]
+    paths:
+      - 'src/**'
+      - Cargo.toml
+      - Cargo.lock
+      - rust-toolchain.toml
   pull_request:
 
 permissions:
@@ -41,16 +46,25 @@ jobs:
           cargo test --locked --release --target "$TARGET"
           cargo build --locked --release --target "$TARGET"
       - name: Package binary
+        id: package
         shell: bash
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           mkdir dist
-          archive="fnm-shim-${GITHUB_SHA}-${TARGET}.tar.gz"
+          version="v0.0.${GITHUB_RUN_NUMBER}"
+          if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
+            version="pr${PR_NUMBER}-${GITHUB_SHA:0:7}"
+          fi
+          artifact="fnm-shim-${version}-${TARGET}"
+          echo "artifact=$artifact" >> "$GITHUB_OUTPUT"
+          archive="$artifact.tar.gz"
           tar -czf "dist/$archive" -C "target/$TARGET/release" fnm-shim -C "$GITHUB_WORKSPACE" LICENSE
           cd dist
           shasum -a 256 "$archive" > "$archive.sha256"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: fnm-shim-${{ github.sha }}-${{ matrix.target }}
+          name: ${{ steps.package.outputs.artifact }}
           path: dist/*
           if-no-files-found: error
 
@@ -67,7 +81,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
-          pattern: fnm-shim-${{ github.sha }}-*
+          pattern: fnm-shim-v0.0.${{ github.run_number }}-*
           path: dist
           merge-multiple: true
       - name: Publish binaries and checksums
