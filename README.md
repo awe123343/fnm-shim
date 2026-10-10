@@ -1,0 +1,73 @@
+# fnm-shim
+
+Small, dependency-free Unix shims for `node`, `npm`, `npx`, and `corepack`.
+Selects the nearest `.node-version` or `.nvmrc`, resolves the highest matching
+installed Node version, and replaces itself with the real command. Other version
+requests fall back to `fnm exec`; without a version file, it uses the fnm default.
+
+Requires [fnm](https://github.com/Schniz/fnm) and an installed Node version.
+Set `FNM_DIR` to your fnm data directory; otherwise the shim uses
+`$HOME/.local/share/fnm`.
+
+## Install
+
+### From GitHub with Cargo
+
+Requires Rust 1.99 or newer. No crates.io publication is needed.
+
+```sh
+cargo +1.99.0 install --git https://github.com/awe123343/fnm-shim \
+  --rev 770be6ebc9667748d561c7b4f7919cdf1076bda3 --locked \
+  --root "$HOME/.local/share/fnm-shim"
+```
+
+Replace the revision with the commit you want, or use `--tag v0.0.N` for a
+published release. Install the toolchain with `rustup toolchain install 1.99.0`
+if necessary.
+
+### Prebuilt binary
+
+Download the matching archive and `SHA256SUMS` from
+[GitHub Releases](https://github.com/awe123343/fnm-shim/releases).
+
+| Platform | Target |
+| --- | --- |
+| Linux x86-64 (Ubuntu 24.04 or compatible glibc) | `x86_64-unknown-linux-gnu` |
+| Linux ARM64 (Ubuntu 24.04 or compatible glibc) | `aarch64-unknown-linux-gnu` |
+| macOS Intel | `x86_64-apple-darwin` |
+| macOS Apple Silicon | `aarch64-apple-darwin` |
+
+In the download directory, replace `ARCHIVE` with the downloaded filename:
+
+```sh
+archive=ARCHIVE
+shasum -a 256 -c SHA256SUMS --ignore-missing
+mkdir -p "$HOME/.local/share/fnm-shim/bin"
+tar -xzf "$archive" -C "$HOME/.local/share/fnm-shim/bin"
+```
+
+### Enable the shims
+
+After either installation method:
+
+```sh
+for tool in node npm npx corepack; do
+  ln -sf fnm-shim "$HOME/.local/share/fnm-shim/bin/$tool"
+done
+export PATH="$HOME/.local/share/fnm-shim/bin:$PATH"
+```
+
+Add the PATH line to your shell configuration after other Node/fnm PATH setup.
+The shim directory must come first. Invoke `node`, `npm`, `npx`, or `corepack`,
+rather than invoking `fnm-shim` directly.
+
+## Releases
+
+Pull requests build and test all four targets and upload archives as Actions
+artifacts. Successful pushes to `main` also publish a GitHub Release with
+binaries, `SHA256SUMS`, and generated release notes.
+
+Tags use `v0.0.<workflow run number>`, and point to the exact built commit.
+Numbers may have gaps because PR runs also increment the counter. These are
+build release identifiers, independent of the Cargo package version. No manual
+tagging or crates.io publishing is required.
