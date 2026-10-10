@@ -94,6 +94,11 @@ export PATH="$HOME/.local/share/fnm-shim/bin:$PATH"
 eval "$(fnm env --use-on-cd --shell zsh)"
 ```
 
+With deferred `fnm env` in `~/.zshrc` (for example, via `zsh-defer`), putting
+the PATH line in `~/.zprofile` also preserves this ordering for login shells.
+Non-login shells do not read `~/.zprofile`; GUI apps only benefit if they inherit
+or explicitly load that environment.
+
 For GUI tools without a fnm multishell, include `~/.local/share/fnm-shim/bin` in the tool's
 PATH ahead of other Node installations, and pass the correct `FNM_DIR`.
 GUI apps do not necessarily inherit your shell configuration. The shim then
@@ -130,6 +135,10 @@ Tags use `v0.0.<workflow run number>`, and point to the exact built commit.
 Numbers may have gaps because PR runs also increment the counter. These are
 build release identifiers, independent of the Cargo package version. No manual
 tagging or crates.io publishing is required.
+
+Re-running an already published workflow keeps the same run number and fails
+when creating the existing release. This intentionally prevents duplicate
+publication or replacement of existing release assets.
 
 ## License
 
