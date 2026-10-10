@@ -18,7 +18,7 @@ Requires Rust 1.99 or newer. No crates.io publication is needed.
 ```sh
 cargo +1.99.0 install --git https://github.com/awe123343/fnm-shim \
   --rev 770be6ebc9667748d561c7b4f7919cdf1076bda3 --locked \
-  --root "$HOME/.local/share/fnm-shim"
+  --root "$HOME/.local"
 ```
 
 Replace the revision with the commit you want, or use `--tag v0.0.N` for a
@@ -42,8 +42,8 @@ In the download directory, replace `ARCHIVE` with the downloaded filename:
 ```sh
 archive=ARCHIVE
 shasum -a 256 -c SHA256SUMS --ignore-missing
-mkdir -p "$HOME/.local/share/fnm-shim/bin"
-tar -xzf "$archive" -C "$HOME/.local/share/fnm-shim/bin"
+mkdir -p "$HOME/.local/bin"
+tar -xzf "$archive" -C "$HOME/.local/bin"
 ```
 
 ### Enable the shims
@@ -52,14 +52,16 @@ After either installation method:
 
 ```sh
 for tool in node npm npx corepack; do
-  ln -sf fnm-shim "$HOME/.local/share/fnm-shim/bin/$tool"
+  ln -s fnm-shim "$HOME/.local/bin/$tool"
 done
-export PATH="$HOME/.local/share/fnm-shim/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 ```
 
 Add the PATH line to your shell configuration after other Node/fnm PATH setup.
 The shim directory must come first. Invoke `node`, `npm`, `npx`, or `corepack`,
-rather than invoking `fnm-shim` directly.
+rather than invoking `fnm-shim` directly. If a command already exists in
+`~/.local/bin`, inspect it before replacing it with a shim. `/usr/local/bin`
+also works for a system-wide install, but may require administrator permissions.
 
 ## Releases
 
