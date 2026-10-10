@@ -104,31 +104,18 @@ also works for a system-wide install, but may require administrator permissions.
 ### macOS signing and Gatekeeper
 
 Release binaries are **not Developer ID signed or notarized by Apple**.
-A linker-generated ad-hoc signature, where present, does not verify the
-publisher's identity and is not a substitute for Developer ID or notarization.
-
-Browser downloads may carry `com.apple.quarantine` metadata, causing Gatekeeper
-to block the executable. Recommended installation options:
-
-- Build locally with Cargo using the commands above.
-- Download with `gh release download`, which normally does not add browser
-  quarantine metadata, then verify `SHA256SUMS` before extracting the binary.
-
-Downloading through GitHub CLI does not make the binary signed or notarized.
-Checksums detect mismatches against the published files; they do not replace
-publisher authentication or Apple's notarization checks. No system-wide
-Gatekeeper changes are needed for the recommended installation methods.
-
-Developer ID signing and notarization are not currently part of the release
-workflow. See [Apple's Developer ID overview](https://developer.apple.com/developer-id/)
-for how those protections work.
+Browser downloads may carry quarantine metadata and be blocked by Gatekeeper.
+Prefer building locally with Cargo, or downloading with `gh release download`
+and verifying `SHA256SUMS` before extraction.
 
 ## Releases
 
-Pull requests build and test all four targets and upload archives as Actions
-artifacts. Pushes to `main` trigger builds and publish a GitHub Release only
-when `src/**`, `Cargo.toml`, or `Cargo.lock` changes. Releases include binaries,
-`SHA256SUMS`, and generated release notes. Documentation, tests, toolchain, and
+Pull requests build and test all four targets and upload Actions artifacts
+named `fnm-shim-pr<number>-<sha7>-<target>` (the SHA identifies the tested merge
+commit). These are preview builds, not published versions.
+Pushes to `main` trigger builds and publish a GitHub Release only when `src/**`,
+`Cargo.toml`, `Cargo.lock`, or `rust-toolchain.toml` changes. Releases include
+binaries, `SHA256SUMS`, and generated release notes. Documentation, tests, and
 workflow-only changes do not publish releases; their PRs still run CI.
 
 Tags use `v0.0.<workflow run number>`, and point to the exact built commit.
