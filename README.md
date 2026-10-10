@@ -101,9 +101,27 @@ rather than invoking `fnm-shim` directly. If a command already exists in
 `~/.local/bin`, inspect it before replacing it with a shim. `/usr/local/bin`
 also works for a system-wide install, but may require administrator permissions.
 
-macOS release binaries are not Developer ID signed or notarized. Browser
-downloads may carry quarantine metadata and be blocked by Gatekeeper. Prefer
-the GitHub CLI download above, or build from source with Cargo.
+### macOS signing and Gatekeeper
+
+Release binaries are **not Developer ID signed or notarized by Apple**.
+A linker-generated ad-hoc signature, where present, does not verify the
+publisher's identity and is not a substitute for Developer ID or notarization.
+
+Browser downloads may carry `com.apple.quarantine` metadata, causing Gatekeeper
+to block the executable. Recommended installation options:
+
+- Build locally with Cargo using the commands above.
+- Download with `gh release download`, which normally does not add browser
+  quarantine metadata, then verify `SHA256SUMS` before extracting the binary.
+
+Downloading through GitHub CLI does not make the binary signed or notarized.
+Checksums detect mismatches against the published files; they do not replace
+publisher authentication or Apple's notarization checks. No system-wide
+Gatekeeper changes are needed for the recommended installation methods.
+
+Developer ID signing and notarization are not currently part of the release
+workflow. See [Apple's Developer ID overview](https://developer.apple.com/developer-id/)
+for how those protections work.
 
 ## Releases
 
