@@ -108,8 +108,10 @@ the GitHub CLI download above, or build from source with Cargo.
 ## Releases
 
 Pull requests build and test all four targets and upload archives as Actions
-artifacts. Successful pushes to `main` also publish a GitHub Release with
-binaries, `SHA256SUMS`, and generated release notes.
+artifacts. Pushes to `main` trigger builds and publish a GitHub Release only
+when `src/**`, `Cargo.toml`, or `Cargo.lock` changes. Releases include binaries,
+`SHA256SUMS`, and generated release notes. Documentation, tests, toolchain, and
+workflow-only changes do not publish releases; their PRs still run CI.
 
 Tags use `v0.0.<workflow run number>`, and point to the exact built commit.
 Numbers may have gaps because PR runs also increment the counter. These are
