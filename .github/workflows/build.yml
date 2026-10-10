@@ -44,7 +44,7 @@ jobs:
         shell: bash
         run: |
           mkdir dist
-          archive="fnm-shim-${GITHUB_SHA}-${TARGET}.tar.gz"
+          archive="fnm-shim-v0.0.${GITHUB_RUN_NUMBER}-${TARGET}.tar.gz"
           tar -czf "dist/$archive" -C "target/$TARGET/release" fnm-shim -C "$GITHUB_WORKSPACE" LICENSE
           cd dist
           shasum -a 256 "$archive" > "$archive.sha256"

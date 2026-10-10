@@ -13,17 +13,31 @@ Set `FNM_DIR` to your fnm data directory; otherwise the shim uses
 
 ### From GitHub with Cargo
 
-Requires Rust 1.99 or newer. No crates.io publication is needed.
+Requires Rust 1.99 or newer. No crates.io publication is needed. Install the
+current `main` branch:
 
 ```sh
-cargo +1.99.0 install --git https://github.com/awe123343/fnm-shim \
-  --rev 770be6ebc9667748d561c7b4f7919cdf1076bda3 --locked \
-  --root "$HOME/.local"
+rustup update stable
+cargo +stable install --git https://github.com/awe123343/fnm-shim \
+  --locked --root "$HOME/.local"
 ```
 
-Replace the revision with the commit you want, or use `--tag v0.0.N` for a
-published release. Install the toolchain with `rustup toolchain install 1.99.0`
-if necessary.
+To install a specific release tag (replace `v0.0.5` with your chosen release):
+
+```sh
+cargo +stable install --git https://github.com/awe123343/fnm-shim \
+  --tag v0.0.5 --locked --root "$HOME/.local"
+```
+
+To pin an exact commit instead:
+
+```sh
+cargo +stable install --git https://github.com/awe123343/fnm-shim \
+  --rev 006c374 --locked --root "$HOME/.local"
+```
+
+Replace `006c374` with the commit you want (a full SHA is also accepted).
+Development and release builds use the toolchain pinned in `rust-toolchain.toml`.
 
 ### Prebuilt binary
 
@@ -37,7 +51,17 @@ Download the matching archive and `SHA256SUMS` from
 | macOS Intel | `x86_64-apple-darwin` |
 | macOS Apple Silicon | `aarch64-apple-darwin` |
 
-In the download directory, replace `ARCHIVE` with the downloaded filename:
+For example, download the latest Apple Silicon release using GitHub CLI
+(replace the target for other platforms):
+
+```sh
+tag=$(gh release view --repo awe123343/fnm-shim --json tagName --jq .tagName)
+gh release download "$tag" --repo awe123343/fnm-shim \
+  --pattern '*-aarch64-apple-darwin.tar.gz' --pattern SHA256SUMS
+```
+
+In the download directory, replace `ARCHIVE` with the downloaded filename.
+New archives use `fnm-shim-<tag>-<target>.tar.gz`:
 
 ```sh
 archive=ARCHIVE
@@ -57,11 +81,29 @@ done
 export PATH="$HOME/.local/bin:$PATH"
 ```
 
-Add the PATH line to your shell configuration after other Node/fnm PATH setup.
-The shim directory must come first. Invoke `node`, `npm`, `npx`, or `corepack`,
+For interactive shells, add the PATH line **before** evaluating `fnm env`, so
+fnm's multishell directory takes precedence and `fnm use` keeps working. For zsh:
+
+```sh
+export PATH="$HOME/.local/bin:$PATH"
+eval "$(fnm env --use-on-cd --shell zsh)"
+```
+
+For GUI tools without a fnm multishell, include `~/.local/bin` in the tool's
+PATH ahead of other Node installations, and pass the correct `FNM_DIR`.
+GUI apps do not necessarily inherit your shell configuration. The shim then
+selects a version from the project or fnm's default alias.
+
+Putting the shim ahead of the multishell instead forces project-file selection
+on every invocation, overriding the version chosen by `fnm use`.
+Invoke `node`, `npm`, `npx`, or `corepack`,
 rather than invoking `fnm-shim` directly. If a command already exists in
 `~/.local/bin`, inspect it before replacing it with a shim. `/usr/local/bin`
 also works for a system-wide install, but may require administrator permissions.
+
+macOS release binaries are not Developer ID signed or notarized. Browser
+downloads may carry quarantine metadata and be blocked by Gatekeeper. Prefer
+the GitHub CLI download above, or build from source with Cargo.
 
 ## Releases
 
